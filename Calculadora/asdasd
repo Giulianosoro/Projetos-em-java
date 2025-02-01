@@ -1,1 +1,89 @@
+package com.mycompany.calculadora;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class Calculadora extends JFrame implements ActionListener {
+    private JTextField textField = new JTextField();
+    private double num1, num2;
+    private char operator;
+
+    public Calculadora() {
+        this.setTitle("Calculadora");
+        this.setSize(250, 350);
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLocationRelativeTo(null);
+        this.setLayout(new GridBagLayout());
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(2, 2, 2, 2);
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        
+        textField.setEditable(false);
+        gbc.gridwidth = 4;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(textField, gbc);
+        
+        JPanel panel = new JPanel(new GridBagLayout());
+        String[] buttons = {"7", "8", "9", "/", "4", "5", "6", "*", "1", "2", "3", "-", "0", "C", "=", "+", "."};
+        
+        GridBagConstraints btnGbc = new GridBagConstraints();
+        btnGbc.fill = GridBagConstraints.BOTH;
+        btnGbc.insets = new Insets(2, 2, 2, 2);
+        btnGbc.weightx = 1;
+        btnGbc.weighty = 1;
+        
+        for (int i = 0; i < buttons.length; i++) {
+            JButton button = new JButton(buttons[i]);
+            button.addActionListener(this);
+            btnGbc.gridwidth = 1;
+            btnGbc.gridx = i % 4;
+            btnGbc.gridy = (i / 4);
+            panel.add(button, btnGbc);
+        }
+        
+        gbc.gridwidth = 4;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(panel, gbc);
+        
+        setVisible(true);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+        
+        if (command.matches("\\d")) {
+            textField.setText(textField.getText() + command);
+        } else if (command.equals(".")) {
+            if (!textField.getText().contains(".")) {
+                textField.setText(textField.getText() + ".");
+            }
+        } else if (command.equals("C")) {
+            textField.setText("");
+            num1 = num2 = 0;
+        } else if (command.equals("=")) {
+            num2 = Double.parseDouble(textField.getText());
+            double result = switch (operator) {
+                case '+' -> num1 + num2;
+                case '-' -> num1 - num2;
+                case '*' -> num1 * num2;
+                case '/' -> num1 / num2;
+                default -> 0;
+            };
+            textField.setText(result % 1 == 0 ? String.valueOf((int) result) : String.valueOf(result));
+        } else {
+            num1 = Double.parseDouble(textField.getText());
+            operator = command.charAt(0);
+            textField.setText("");
+        }
+    }
+
+    public static void main(String[] args) {
+        new Calculadora();
+    }
+}
